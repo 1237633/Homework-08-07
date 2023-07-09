@@ -21,6 +21,7 @@ class StringListImplTest {
             stringList.add(String.valueOf(i));
             expected[i] = String.valueOf(i);
         }
+        System.out.println(Arrays.toString(stringList.toArray()));
         Assertions.assertArrayEquals(expected, stringList.toArray());
 
     }
@@ -30,7 +31,7 @@ class StringListImplTest {
         for (int i = 0; i < 5; i++) {
             stringList.add(String.valueOf(i));
         }
-        String[] expected = {"0", "1", "2", "a", "4", null, null, null, null, null};
+        String[] expected = {"0", "1", "2", "a", "3", "4", null, null, null, null};
         stringList.add(3, "a");
         Assertions.assertArrayEquals(expected, stringList.toArray());
     }
@@ -249,5 +250,16 @@ class StringListImplTest {
             expected[i] = String.valueOf(i);
         }
         Assertions.assertArrayEquals(expected, stringList.toArray());
+    }
+    @Test
+    void allNullsTest() {
+        stringList.add("Vasya");
+        Assertions.assertThrows(NullItemException.class, () -> stringList.add(null));
+        Assertions.assertThrows(NullItemException.class, () -> stringList.add(0,null));
+        Assertions.assertThrows(NullItemException.class, () -> stringList.contains(null));
+        Assertions.assertThrows(NullItemException.class, () -> stringList.set(0, null));
+        Assertions.assertThrows(NullItemException.class, () -> stringList.indexOf(null));
+        Assertions.assertThrows(NullItemException.class, () -> stringList.lastIndexOf(null));
+        Assertions.assertThrows(NullItemException.class, () -> stringList.remove(null));
     }
 }

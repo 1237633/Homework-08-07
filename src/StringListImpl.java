@@ -12,31 +12,34 @@ public class StringListImpl implements StringList {
 
     @Override
     public String add(String item) {
+        if (item == null) {
+            throw new NullItemException("You can't add null element!");
+        }
         if (arraySize < stringArray.length - 2) { // Оставляем небольшой запас для "заглядывания вперед" разными методами
             stringArray[arraySize] = item;
         } else {
-            String[] newArray = stringArray;
-            stringArray = new String[arraySize + 10];
-
-            for (int i = 0; i < arraySize; i++) {
-                stringArray[i] = newArray[i];
-            }
-
+            stringArray = Arrays.copyOf(stringArray, arraySize + 10);
             stringArray[arraySize] = item;
         }
         arraySize++;
-        // System.out.println(item + " " + arraySize + " " + stringArray.length);
+        //System.out.println(item + " " + arraySize + " " + stringArray.length);
         return item;
     }
 
     @Override
     public String add(int index, String item) {
+        if (item == null) {
+            throw new NullItemException("You can't add null element!");
+        }
         if (index < 0) {
             throw new IllegalArgumentException("Index of element must be positive!");
         }
         if (index > arraySize - 1) {  //arraySize can't be > array.length
             throw new IndexOutOfBoundsException("There is no such cell in List");
         } else {
+            for (int i = arraySize; i >= index; i--) {
+                stringArray[i] = stringArray[i - 1];
+            }
             stringArray[index] = item;
         }
         return item;
@@ -44,6 +47,9 @@ public class StringListImpl implements StringList {
 
     @Override
     public String set(int index, String item) {
+        if (item == null) {
+            throw new NullItemException("Null parameter received for 'item'");
+        }
         if (index > arraySize - 1 || index < 0) {
             throw new IllegalArgumentException("Index must be positive and less or equal to List size -1");
         }
@@ -56,6 +62,9 @@ public class StringListImpl implements StringList {
 
     @Override
     public String remove(String item) {
+        if (item == null) {
+            throw new NullItemException("Null parameter received for 'item'");
+        }
         if (!contains(item)) {
             throw new IllegalArgumentException("No such item!");
         }
@@ -83,6 +92,9 @@ public class StringListImpl implements StringList {
 
     @Override
     public boolean contains(String item) {
+        if (item == null) {
+            throw new NullItemException("Null parameter received for 'item'");
+        }
         for (int i = 0; i < arraySize; i++) {
             if (stringArray[i].equals(item)) {
                 return true;
@@ -93,6 +105,9 @@ public class StringListImpl implements StringList {
 
     @Override
     public int indexOf(String item) {
+        if (item == null) {
+            throw new NullItemException("Null parameter received for 'item'");
+        }
         for (int i = 0; i < arraySize; i++) {
             if (stringArray[i].equals(item)) {
                 return i;
@@ -103,6 +118,9 @@ public class StringListImpl implements StringList {
 
     @Override
     public int lastIndexOf(String item) {
+        if (item == null) {
+            throw new NullItemException("Null parameter received for 'item'");
+        }
         for (int i = arraySize - 1; i >= 0; i--) {
             if (stringArray[i].equals(item)) {
                 return i;
