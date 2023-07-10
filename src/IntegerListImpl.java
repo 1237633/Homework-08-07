@@ -3,31 +3,35 @@ import java.util.Objects;
 
 public class IntegerListImpl implements IntegerList {
     private int initialSize;
-    private int arraySize = 0;
-    private String[] IntegerArray = new String[initialSize];
+    private int arraySize;
+    private Integer[] integerArray = new Integer[initialSize];
+    private boolean sorted;
 
     public IntegerListImpl(int initialSize) {
         this.initialSize = initialSize;
+        sorted = false;
+        arraySize = 0;
     }
 
     @Override
-    public String add(String item) {
+    public Integer add(Integer item) {
         if (item == null) {
             throw new NullItemException("You can't add null element!");
         }
-        if (arraySize < IntegerArray.length - 2) { // Оставляем небольшой запас для "заглядывания вперед" разными методами
-            IntegerArray[arraySize] = item;
+        if (arraySize < integerArray.length - 2) { // Оставляем небольшой запас для "заглядывания вперед" разными методами
+            integerArray[arraySize] = item;
         } else {
-            IntegerArray = Arrays.copyOf(IntegerArray, arraySize + 10);
-            IntegerArray[arraySize] = item;
+            integerArray = Arrays.copyOf(integerArray, arraySize + 10);
+            integerArray[arraySize] = item;
         }
         arraySize++;
-        //System.out.println(item + " " + arraySize + " " + IntegerArray.length);
+        sorted = false;
+        //System.out.println(item + " " + arraySize + " " + integerArray.length);
         return item;
     }
 
     @Override
-    public String add(int index, String item) {
+    public Integer add(int index, Integer item) {
         if (item == null) {
             throw new NullItemException("You can't add null element!");
         }
@@ -38,30 +42,29 @@ public class IntegerListImpl implements IntegerList {
             throw new IndexOutOfBoundsException("There is no such cell in List");
         } else {
             for (int i = arraySize; i >= index; i--) {
-                IntegerArray[i] = IntegerArray[i - 1];
+                integerArray[i] = integerArray[i - 1];
             }
-            IntegerArray[index] = item;
+            integerArray[index] = item;
         }
+        sorted = false;
         return item;
     }
 
     @Override
-    public String set(int index, String item) {
+    public Integer set(int index, Integer item) {
         if (item == null) {
             throw new NullItemException("Null parameter received for 'item'");
         }
         if (index > arraySize - 1 || index < 0) {
             throw new IllegalArgumentException("Index must be positive and less or equal to List size -1");
         }
-        if (!contains(item)) {
-            throw new IllegalArgumentException("No such item in list!");
-        }
-        IntegerArray[index] = item;
+        integerArray[index] = item;
+        sorted = false;
         return item;
     }
 
     @Override
-    public String remove(String item) {
+    public Integer remove(Integer item) {
         if (item == null) {
             throw new NullItemException("Null parameter received for 'item'");
         }
@@ -74,55 +77,63 @@ public class IntegerListImpl implements IntegerList {
     }
 
     @Override
-    public String remove(int index) {
+    public Integer remove(int index) {
         if (index > arraySize - 1 || index < 0) {
             throw new IllegalArgumentException("Index must be positive and less or equal to List size -1");
         }
-        String result = IntegerArray[index];
+        Integer result = integerArray[index];
         for (int i = index; i < arraySize; i++) {
-            if (IntegerArray[i + 1] == null) {
-                IntegerArray[i] = null;
-                break;
-            }
-            IntegerArray[i] = IntegerArray[i + 1];
+            integerArray[i] = integerArray[i + 1];
         }
         arraySize--;
         return result;
     }
 
     @Override
-    public boolean contains(String item) {
+    public boolean contains(Integer item) {
         if (item == null) {
             throw new NullItemException("Null parameter received for 'item'");
         }
-        for (int i = 0; i < arraySize; i++) {
-            if (IntegerArray[i].equals(item)) {
-                return true;
-            }
+        if (indexOf(item) >= 0) {
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     @Override
-    public int indexOf(String item) {
+    public int indexOf(Integer item) {
         if (item == null) {
             throw new NullItemException("Null parameter received for 'item'");
         }
-        for (int i = 0; i < arraySize; i++) {
-            if (IntegerArray[i].equals(item)) {
-                return i;
+        if (!sorted) {
+            sortWithTimSort();
+        }
+        int min = 0;
+        int max = arraySize - 1;
+        int mid;
+        while (min <= max) {
+            mid = (min + max) / 2;
+            if (integerArray[mid] == item) {
+                return mid;
+            }
+            if (integerArray[mid] > item) {
+                max = mid - 1;
+            } else {
+                min = mid + 1;
             }
         }
+
         return -1;
     }
 
     @Override
-    public int lastIndexOf(String item) {
+    public int lastIndexOf(Integer item) {
         if (item == null) {
             throw new NullItemException("Null parameter received for 'item'");
         }
         for (int i = arraySize - 1; i >= 0; i--) {
-            if (IntegerArray[i].equals(item)) {
+            if (integerArray[i].equals(item)) {
                 return i;
             }
         }
@@ -130,32 +141,27 @@ public class IntegerListImpl implements IntegerList {
     }
 
     @Override
-    public String get(int index) {
+    public Integer get(int index) {
         if (index > arraySize - 1 || index < 0) {
             throw new IllegalArgumentException("Index must be positive and less or equal to List size -1");
         }
-        String result = IntegerArray[index];
+        Integer result = integerArray[index];
         return result;
-    }
-
-    @Override
-    public boolean equals(IntegerList otherList) {
-        return false;
     }
 
     @Override
     public int hashCode() {
         int result = Objects.hash(arraySize);
-        result = 31 * result + Arrays.hashCode(IntegerArray);
+        result = 31 * result + Arrays.hashCode(integerArray);
         return result;
     }
 
 
-    public boolean equals(StringList otherList) {
+    public boolean equals(IntegerList otherList) {
         if (this == otherList) return true;
         if (otherList == null || getClass() != otherList.getClass()) return false;
         IntegerListImpl that = (IntegerListImpl) otherList;
-        return arraySize == that.arraySize && Arrays.equals(IntegerArray, that.IntegerArray);
+        return arraySize == that.arraySize && Arrays.equals(integerArray, that.integerArray);
     }
 
     @Override
@@ -174,12 +180,38 @@ public class IntegerListImpl implements IntegerList {
 
     @Override
     public void clear() {
-        IntegerArray = new String[10];
+        integerArray = new Integer[10];
+        sorted = false;
     }
 
     @Override
-    public String[] toArray() {
-        String[] result = IntegerArray;
+    public Integer[] toArray() {
+        Integer[] result = integerArray;
         return result;
+    }
+
+    @Override
+    public void sortWithTimSort() {  // Неьбольшой чит, поскольку по факту самым быстрым из рассмотренных во ВСЕМ уроке был тимсорт, который в итоге лежит в основе Arrays.sort.
+        // На написание комментария потрачено больше времени и сил, чем на написание метода. Этот труд точно того стоит
+        Arrays.sort(integerArray, 0, arraySize);
+        sorted = true;
+    }
+
+    @Override
+    public void sort() {
+        Integer temp;
+        for (int i = 1; i < integerArray.length; i++) {
+            temp = integerArray[i];
+            int j = i;
+            if (integerArray[j] == null) {
+                break;
+            }
+            while (j > 0 && integerArray[j - 1] >= temp) {
+                integerArray[j] = integerArray[j - 1];
+                j--;
+            }
+            integerArray[j] = temp;
+        }
+        sorted = true;
     }
 }
