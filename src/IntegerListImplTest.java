@@ -19,7 +19,7 @@ class IntegerListImplTest {
 
     @Test
     void add() {
-        Integer[] expected = new Integer[34];
+        Integer[] expected = new Integer[33];
         for (int i = 0; i < 30; i++) {
             integerList.add(i);
             expected[i] = i;
@@ -57,7 +57,7 @@ class IntegerListImplTest {
 
     @Test
     void set() {
-        Integer[] expected = {0, 1, 6, 3, 4, 5, 6, 7, 8, 9, 10, null, null, null, null, null, null, null};
+        Integer[] expected = {0, 1, 6, 3, 4, 5, 6, 7, 8, 9, 10, null, null, null, null};
         for (int i = 0; i < 11; i++) {
             integerList.add(i);
         }
@@ -77,7 +77,7 @@ class IntegerListImplTest {
 
     @Test
     void remove() {
-        Integer[] expected = {0, 1, 2, 3, 4, 5, 7, 8, 9, 10, null, null, null, null, null, null, null, null};
+        Integer[] expected = {0, 1, 2, 3, 4, 5, 7, 8, 9, 10, null, null, null, null, null};
         for (int i = 0; i < 11; i++) {
             integerList.add(i);
         }
@@ -96,7 +96,7 @@ class IntegerListImplTest {
 
     @Test
     void testRemove() {
-        Integer[] expected = {0, 1, 2, 3, 4, 6, 7, 8, 9, 10, null, null, null, null, null, null, null, null};
+        Integer[] expected = {0, 1, 2, 3, 4, 6, 7, 8, 9, 10, null, null, null, null, null};
         for (int i = 0; i < 11; i++) {
             integerList.add(i);
         }
@@ -278,8 +278,8 @@ class IntegerListImplTest {
 
     @Test
     void sort() {
-        for (int i = 0; i < 25; i++) {
-            integerList.add(random.nextInt(500));
+        for (int i = 0; i < 500; i++) {
+            integerList.add(random.nextInt(50000));
         }
 
         integerList.sort();
