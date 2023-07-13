@@ -113,14 +113,15 @@ class SortingTests {
         spentIS = System.currentTimeMillis() - startIS;
         System.out.println("InsertionSelection: " + spentIS);
 
-        //Timsort time
+        //MergeSort time
         long startTS = System.currentTimeMillis();
         long spentTS;
 
-        integerList.sortWithTimSort();
+
+        integerList.sort();
 
         spentTS = System.currentTimeMillis() - startTS;
-        System.out.println("Timsort: " + spentTS);
+        System.out.println("MergeSort: " + spentTS);
 
     }
 }

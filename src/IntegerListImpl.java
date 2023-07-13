@@ -4,13 +4,21 @@ import java.util.Objects;
 public class IntegerListImpl implements IntegerList {
     private int initialSize;
     private int arraySize;
-    private Integer[] integerArray = new Integer[initialSize];
+    private Integer[] integerArray;
     private boolean sorted;
 
     public IntegerListImpl(int initialSize) {
         this.initialSize = initialSize;
+        integerArray = new Integer[initialSize];
         sorted = false;
         arraySize = 0;
+    }
+
+    private void grow() {
+        int newLength = (int) (integerArray.length * 1.5);
+        if ((integerArray.length - arraySize) <= 1) {
+            integerArray = Arrays.copyOf(integerArray, newLength);
+        }
     }
 
     @Override
@@ -18,12 +26,8 @@ public class IntegerListImpl implements IntegerList {
         if (item == null) {
             throw new NullItemException("You can't add null element!");
         }
-        if (arraySize < integerArray.length - 2) { // Оставляем небольшой запас для "заглядывания вперед" разными методами
-            integerArray[arraySize] = item;
-        } else {
-            integerArray = Arrays.copyOf(integerArray, arraySize + 10);
-            integerArray[arraySize] = item;
-        }
+        grow();
+        integerArray[arraySize] = item;
         arraySize++;
         sorted = false;
         //System.out.println(item + " " + arraySize + " " + integerArray.length);
@@ -106,9 +110,7 @@ public class IntegerListImpl implements IntegerList {
         if (item == null) {
             throw new NullItemException("Null parameter received for 'item'");
         }
-        if (!sorted) {
-            sortWithTimSort();
-        }
+        sort();
         int min = 0;
         int max = arraySize - 1;
         int mid;
@@ -199,19 +201,68 @@ public class IntegerListImpl implements IntegerList {
 
     @Override
     public void sort() {
-        Integer temp;
-        for (int i = 1; i < integerArray.length; i++) {
-            temp = integerArray[i];
-            int j = i;
-            if (integerArray[j] == null) {
-                break;
-            }
-            while (j > 0 && integerArray[j - 1] >= temp) {
-                integerArray[j] = integerArray[j - 1];
-                j--;
-            }
-            integerArray[j] = temp;
+        if (!sorted) {
+            mergeSort();
+            sorted = true;
+        } else {
+            return;
         }
-        sorted = true;
+    }
+
+    private void mergeSort(Integer[] array) {
+        if (array.length < 2) {
+            return;
+        }
+        int pivot = array.length / 2;
+        Integer[] left = new Integer[pivot];
+        Integer[] right = new Integer[array.length - pivot];
+
+        for (int i = 0; i < left.length; i++) {
+            left[i] = array[i];
+        }
+        for (int i = 0; i < right.length; i++) {
+            right[i] = array[pivot + i];
+        }
+
+        mergeSort(left);
+        mergeSort(right);
+
+        merge(array, left, right);
+
+    }
+
+    private void mergeSort() {
+        Integer[] arrToSort = Arrays.copyOf(integerArray, arraySize);
+        mergeSort(arrToSort);
+        integerArray = Arrays.copyOf(arrToSort, integerArray.length);
+    }
+
+    private void merge(Integer[] array, Integer[] left, Integer[] right) {
+        int mainP = 0;
+        int leftP = 0;
+        int rightP = 0;
+
+        while (leftP < left.length && rightP < right.length) {
+            if (left[leftP] <= right[rightP]) {
+                array[mainP] = left[leftP];
+                mainP++;
+                leftP++;  //в таком виде не так красиво, но более читабельно на мой взгляд
+            } else {
+                array[mainP] = right[rightP];
+                mainP++;
+                rightP++;
+            }
+        }
+
+        while (leftP < left.length) {
+            array[mainP] = left[leftP];
+            mainP++;
+            leftP++;
+        }
+        while (rightP < right.length) {
+            array[mainP] = right[rightP];
+            mainP++;
+            rightP++;
+        }
     }
 }
